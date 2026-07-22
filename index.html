@@ -144,7 +144,7 @@
   .check-item.done .txt{ color: var(--muted); text-decoration: line-through; }
   .tap-row{ cursor:pointer; }
 
-  /* ---------- ACCORDIONS (Ticket-stub style) ---------- */
+  /* ---------- ACCORDIONS ---------- */
   .stub{
     position:relative;
     background: var(--surface);
@@ -318,8 +318,8 @@
 <div id="app">
 
   <header class="top">
-    <p class="eyebrow">Grupo de 8 </p>
-    <h1 class="title">Dossier <span>Compras 2026</span></h1>
+    <p class="eyebrow">Grupo de 8 personas</p>
+    <h1 class="title">Plan <span>Compras 2026</span></h1>
     <p class="subtitle">Logística, Distancias (km) y Horarios de Atención</p>
   </header>
 
@@ -332,18 +332,19 @@
       <div class="date-row">
         <div class="date-card">
           <div class="date-num">~$340</div>
-          <div class="date-desc">USD Total para el grupo completo (suma de los 2 autos x 3 dias).</div>
+          <div class="date-desc">USD Total acumulado para los 8 (suma de los 2 autos x los 3 días).</div>
         </div>
         <div class="date-card">
           <div class="date-num">2 Autos</div>
-          <div class="date-desc">Al ser 8 personas se solicitan 2 x Uber X (o 2 x Uber XL con valijas).</div>
+          <div class="date-desc">Pedir siempre 2 x Uber X (o 2 x Uber XL con valijas).</div>
         </div>
       </div>
 
       <p class="section-label">Reglas de Oro de Transporte</p>
       <div class="info-box">
         <b>🚌 Disney Springs Gratis:</b> Desde All-Star Movies se usa el bus oficial de Disney ($0 USD).<br><br>
-        <b>🛒 Walmart SIEMPRE al final:</b> Nunca hacer supermercado primero para no cargar bolsas pesadas.
+        <b>🏰 Disney Outlet Oficial:</b> En Vineland Outlets está <i>Disney's Character Warehouse</i> (50-80% off). ¡Ir a las 09:45 AM!<br><br>
+        <b>🛒 Walmart SIEMPRE al final:</b> Se hace como última parada para cargar todo pesado directo al auto.
       </div>
 
       <p class="section-label">Checklist de Preparación</p>
@@ -384,7 +385,8 @@
 /* ================= DATA ================= */
 
 const checklistItems = [
-  "Llevar una valija carry-on vacía para recorrer el Vineland Outlet sin cargar bolsas.",
+  "Llevar una valija carry-on vacía para recorrer el Vineland Outlet sin cargar bolsas de ropa.",
+  "Disney Outlet (Lunes 12): Llegar a Vineland a las 09:45 AM para entrar de primeros a Disney's Character Warehouse.",
   "Pedir siempre 2 vehículos Uber en simultáneo (2 x Uber X para compras / 2 x Uber XL con maletas).",
   "Para ir a Disney Springs usar el bus de All-Star Movies (Gratis / $0 USD).",
   "Walmart es siempre la última parada del día para cargar las bolsas pesadas directo al hotel."
@@ -436,12 +438,13 @@ const dom11Data = [
 
 const lun12Data = [
   {
-    title: "1. Orlando Vineland Premium Outlets",
+    title: "1. Orlando Vineland Premium Outlets + Disney Outlet",
     sub: "Horario Lunes: 10:00 AM – 9:00 PM · Llegada 09:45 AM",
     address: "8200 Vineland Ave, Orlando, FL 32821",
     tags: ["uber"],
     transport: "🚗 2 x Uber X | Distancia: 13.2 km | Tiempo: 15-18 min | Costo: ~$30-$36 USD total",
     details: [
+      "🏰 <b>PRIORIDAD 1 (09:45 AM):</b> Ir directo a <i>Disney's Character Warehouse</i> (el outlet oficial de Disney con 50-80% off en mercadería de parques). Llegar temprano evita filas de 1-2 horas.",
       "Marcas clave: Nike Factory, Adidas, Tommy Hilfiger, Under Armour, Levi's, Columbia.",
       "Llevar la valija carry-on vacía para meter las compras de ropa.",
       "Almuerzo a las 12:30 hs en el Patio de Comidas interno.",
@@ -452,10 +455,10 @@ const lun12Data = [
     title: "2. Best Buy Kissimmee + The Loop",
     sub: "Horario Best Buy: 10:00 AM – 8:00 PM (Store #1529)",
     address: "1620 W Osceola Pkwy, Kissimmee, FL 34741",
-    tags: ["uber","pickup"],
+    tags: ["uber"],
     transport: "🚗 2 x Uber X | Distancia: 9.8 km | Tiempo: 12-15 min | Costo: ~$24-$30 USD total",
     details: [
-      "1. Entrar a Best Buy Kissimmee y hacer las compras de electronica.",
+      "1. Entrar a Best Buy Kissimmee y hacer las compras de tecnologia/electronica.",
       "2. Caminar 250 metros cruzando el estacionamiento hacia el complejo The Loop.",
       "3. Recorrer Ross Dress for Less, Marshalls y T.J. Maxx para ropa de descuento y valijas.",
       "Permanencia sugerida: 3.5 horas (13:30 a 17:00 hs)."
@@ -514,7 +517,7 @@ const dom18Data = [
     title: "2. Best Buy Millenia (A pie)",
     sub: "Horario Domingo: 11:00 AM – 7:00 PM",
     address: "4155 Millenia Blvd, Orlando, FL 32839",
-    tags: ["free","pickup"],
+    tags: ["free"],
     transport: "🚶 A PIE | Distancia: 0.6 km (600 metros) | Tiempo: 5 min | Costo: $0 USD",
     details: [
       "Salir por la entrada principal del Mall, cruzar Millenia Blvd por el semáforo y caminar 5 min a Best Buy.",
@@ -523,18 +526,29 @@ const dom18Data = [
     ]
   },
   {
-    title: "3. Walmart Supercenter (S Kirkman Rd)",
-    sub: "Horario: 6:00 AM – 11:00 PM · Llegada 16:00 hs",
+    title: "3. (Opcional) Orlando International Premium Outlets",
+    sub: "Horario Domingo: 10:00 AM – 8:00 PM",
+    address: "4951 International Dr, Orlando, FL 32819",
+    tags: ["uber"],
+    transport: "🚗 2 x Uber X | Distancia: 3.8 km | Tiempo: 8 min | Costo: ~$14-$18 USD total",
+    details: [
+      "Parada opcional si se quedaron con ganas de más compras de ropa cerca de la zona Universal.",
+      "Incluye la segunda sucursal de Disney's Character Warehouse."
+    ]
+  },
+  {
+    title: "4. Walmart Supercenter (S Kirkman Rd)",
+    sub: "Horario: 6:00 AM – 11:00 PM · Llegada 16:00/17:00 hs",
     address: "2500 S Kirkman Rd, Orlando, FL 32819",
     tags: ["uber","walmart"],
     transport: "🚗 2 x Uber X | Distancia: 6.1 km | Tiempo: 8-10 min | Costo: ~$20-$24 USD total",
     details: [
       "Compras de supermercado finales y golosinas para el bloque de Universal / Epic Universe.",
-      "Permanencia sugerida: 2 horas (16:00 a 18:00 hs)."
+      "Permanencia sugerida: 1.5 a 2 horas."
     ]
   },
   {
-    title: "4. Regreso y Check-in Terra Luna Resort",
+    title: "5. Regreso y Check-in Terra Luna Resort",
     sub: "Llegada 18:30 hs aprox.",
     address: "4100 Universal Blvd, Orlando, FL 32819",
     tags: ["uber"],
