@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Orlando 2026 · Dossier de Compras</title>
+<style>
+  :root{
+    --bg: #12181f;
+    --surface: #1b2430;
+    --surface-2: #232e3c;
+    --stub-edge: #0e131a;
+    --text: #f4efe4;
+    --muted: #93a1b0;
+    --coral: #ff6b4a;
+    --amber: #ffb347;
+    --teal: #2dd4bf;
+    --line: rgba(244,239,228,0.09);
+
+    --free-bg:#2fbf83; --free-fg:#04180d;
+    --uber-bg:#3d8bff; --uber-fg:#eaf2ff;
+    --uberxl-bg:#a06bff; --uberxl-fg:#f3ecff;
+    --pickup-bg:#e8c15a; --pickup-fg:#3a2c00;
+    --walmart-bg:#ff8a3d; --walmart-fg:#3a1900;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0; overflow-x:hidden;}
+  body{
+    background: radial-gradient(1200px 800px at 50% -10%, #1a2431 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+  }
+
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    background: var(--bg);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    box-shadow: 0 0 60px rgba(0,0,0,0.5);
+  }
+
+  /* ---------- HEADER ---------- */
+  header.top{
+    padding: 22px 18px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #1a2431, transparent);
+  }
+  .eyebrow{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 3px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin: 0 0 6px;
+  }
+  h1.title{
+    margin:0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height:1.15;
+  }
+  h1.title span{ color: var(--coral); }
+  .subtitle{
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ---------- TAB PANELS ---------- */
+  main{
+    flex:1;
+    padding: 16px 14px 100px;
+    overflow-y:auto;
+  }
+  .panel{ display:none; animation: fadeIn .18s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-label{
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin: 18px 4px 10px;
+    font-weight:700;
+  }
+  .section-label:first-child{ margin-top:2px; }
+
+  /* ---------- KEY DATE CARDS ---------- */
+  .date-row{ display:flex; gap:10px; margin-bottom:14px; }
+  .date-card{
+    flex:1;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px 12px;
+    border: 1px solid var(--line);
+  }
+  .date-num{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--coral);
+    line-height:1;
+  }
+  .date-desc{ font-size: 12px; color: var(--muted); margin-top: 6px; line-height:1.4; }
+
+  /* ---------- CHECKLIST ---------- */
+  .check-item{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 13px 14px;
+    margin-bottom: 8px;
+    min-height: 44px;
+  }
+  .check-item .box{
+    width: 26px; height:26px; min-width:26px;
+    border-radius: 8px;
+    border: 2px solid var(--muted);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 15px;
+    color: transparent;
+    transition: all .15s ease;
+    margin-top:1px;
+  }
+  .check-item.done .box{
+    background: var(--free-bg);
+    border-color: var(--free-bg);
+    color: #04180d;
+  }
+  .check-item .txt{ font-size: 14px; line-height:1.45; padding-top:2px; }
+  .check-item.done .txt{ color: var(--muted); text-decoration: line-through; }
+  .tap-row{ cursor:pointer; }
+
+  /* ---------- ACCORDIONS (Ticket-stub style) ---------- */
+  .stub{
+    position:relative;
+    background: var(--surface);
+    border-radius: 16px;
+    margin-bottom: 14px;
+    border: 1px solid var(--line);
+    overflow:hidden;
+  }
+  .stub-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding: 14px 16px;
+    min-height:44px;
+  }
+  .stub-head .htxt{ flex:1; }
+  .stub-head .park-name{ font-size:16px; font-weight:800; letter-spacing:-0.2px; }
+  .stub-head .park-sub{ font-size:12px; color:var(--muted); margin-top:3px; }
+  .chev{
+    width:30px; height:30px;
+    border-radius:50%;
+    background: var(--surface-2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px;
+    transition: transform .2s ease;
+    flex-shrink:0;
+  }
+  .stub.open .chev{ transform: rotate(180deg); }
+
+  .stub-body{
+    max-height:0;
+    overflow:hidden;
+    transition: max-height .28s ease;
+    padding: 0 16px;
+  }
+  .stub.open .stub-body{ padding: 8px 16px 18px; }
+
+  .rope-drop{
+    margin: 0 16px 14px;
+    background: linear-gradient(135deg, rgba(61,139,255,0.18), rgba(47,191,131,0.10));
+    border: 1px solid rgba(61,139,255,0.35);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height:1.5;
+  }
+  .rope-drop b{ color: var(--amber); }
+
+  .block-title{
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--teal);
+    font-weight: 800;
+    margin: 16px 0 8px;
+  }
+  .block-title:first-of-type{ margin-top:4px; }
+
+  p.body-text{ font-size:13.5px; line-height:1.6; color: #dfe4ea; margin: 8px 0; }
+  p.body-text b{ color: var(--text); }
+  p.body-text.muted{ color: var(--muted); font-size:12.5px; }
+
+  /* ---------- GPS / ADDRESS BOX ---------- */
+  .gps-box{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: var(--amber);
+    margin: 8px 0 12px;
+    word-break: break-all;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+
+  /* ---------- BADGES ---------- */
+  .badge{
+    display:inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin: 2px 4px 2px 0;
+    white-space:nowrap;
+  }
+  .b-free{ background: var(--free-bg); color: var(--free-fg); }
+  .b-uber{ background: var(--uber-bg); color: var(--uber-fg); }
+  .b-uberxl{ background: var(--uberxl-bg); color: var(--uberxl-fg); }
+  .b-pickup{ background: var(--pickup-bg); color: var(--pickup-fg); }
+  .b-walmart{ background: var(--walmart-bg); color: var(--walmart-fg); }
+
+  .info-box{
+    background: rgba(45,212,191,0.10);
+    border: 1px solid rgba(45,212,191,0.35);
+    border-radius: 12px;
+    padding: 12px 13px;
+    font-size: 12.5px;
+    line-height:1.55;
+    margin: 10px 0;
+  }
+  .info-box b{ color: var(--teal); }
+
+  .tip-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 12px;
+  }
+  .tip-card h3{
+    margin:0 0 8px;
+    font-size: 14.5px;
+    font-weight:800;
+    display:flex; align-items:center; gap:8px;
+  }
+  .tip-card h3 .ic{
+    width:32px; height:32px; border-radius:9px;
+    background: var(--surface-2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; flex-shrink:0;
+  }
+
+  /* ---------- BOTTOM NAV ---------- */
+  nav.bottom{
+    position: sticky;
+    bottom:0;
+    left:0; right:0;
+    display:flex;
+    background: rgba(27,36,48,0.92);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--line);
+    padding: 6px 4px calc(8px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  nav.bottom button{
+    flex:1;
+    background:none;
+    border:none;
+    color: var(--muted);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    padding: 8px 2px;
+    min-height:52px;
+    font-family:inherit;
+    font-size: 10px;
+    font-weight:600;
+    letter-spacing: 0.2px;
+    border-radius: 12px;
+    transition: color .15s ease, background .15s ease;
+  }
+  nav.bottom button .navicon{ font-size:18px; line-height:1; }
+  nav.bottom button.active{
+    color: var(--coral);
+    background: rgba(255,107,74,0.10);
+  }
+
+  ::-webkit-scrollbar{ display:none; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="top">
+    <p class="eyebrow">Grupo de 8 · 3 habitaciones</p>
+    <h1 class="title">Dossier <span>Compras 2026</span></h1>
+    <p class="subtitle">Logística, Distancias (km) y Horarios de Atención</p>
+  </header>
+
+  <main>
+
+    <!-- ============ PANEL 1: RESUMEN ============ -->
+    <section class="panel active" id="panel-resumen">
+
+      <p class="section-label">Presupuesto Estimado de Uber (8 pax)</p>
+      <div class="date-row">
+        <div class="date-card">
+          <div class="date-num">~$340</div>
+          <div class="date-desc">USD Total para el grupo completo (suma de los 2 autos por viaje).</div>
+        </div>
+        <div class="date-card">
+          <div class="date-num">2 Autos</div>
+          <div class="date-desc">Al ser 8 personas se solicitan 2 x Uber X (o 2 x Uber XL con valijas).</div>
+        </div>
+      </div>
+
+      <p class="section-label">Reglas de Oro de Transporte</p>
+      <div class="info-box">
+        <b>🚌 Disney Springs Gratis:</b> Desde All-Star Movies se usa el bus oficial de Disney ($0 USD).<br><br>
+        <b>📦 Store Pickup:</b> Comprar en la web de Apple y Best Buy 3-4 días antes de viajar.<br><br>
+        <b>🛒 Walmart SIEMPRE al final:</b> Nunca hacer supermercado primero para no cargar bolsas pesadas.
+      </div>
+
+      <p class="section-label">Checklist de Preparación</p>
+      <div id="checklist-container"></div>
+
+    </section>
+
+    <!-- ============ PANEL 2: DOMINGO 11 OCT ============ -->
+    <section class="panel" id="panel-dom11">
+      <p class="section-label">Llegada &amp; Disney Springs (Tarde/Noche)</p>
+      <div id="dom11-container"></div>
+    </section>
+
+    <!-- ============ PANEL 3: LUNES 12 OCT ============ -->
+    <section class="panel" id="panel-lun12">
+      <p class="section-label">Día de Compras Zona Disney / Kissimmee</p>
+      <div id="lun12-container"></div>
+    </section>
+
+    <!-- ============ PANEL 4: DOMINGO 18 OCT ============ -->
+    <section class="panel" id="panel-dom18">
+      <p class="section-label">Traslado a Universal &amp; Zona Millenia</p>
+      <div id="dom18-container"></div>
+    </section>
+
+  </main>
+
+  <nav class="bottom" id="bottomNav">
+    <button data-tab="resumen" class="active"><span class="navicon">📋</span>Resumen</button>
+    <button data-tab="dom11"><span class="navicon">✈️</span>11 Oct</button>
+    <button data-tab="lun12"><span class="navicon">🛍️</span>12 Oct</button>
+    <button data-tab="dom18"><span class="navicon">🏨</span>18 Oct</button>
+  </nav>
+
+</div>
+
+<script>
+/* ================= DATA ================= */
+
+const checklistItems = [
+  "Llevar una valija carry-on vacía para recorrer el Vineland Outlet sin cargar bolsas.",
+  "Comprar online en Best Buy (Kindle) 3-4 días antes seleccionando Store Pickup (Sucursal #1529 Kissimmee).",
+  "Comprar online en Apple Store (Mall at Millenia) 3-4 días antes seleccionando Store Pickup.",
+  "Pedir siempre 2 vehículos Uber en simultáneo (2 x Uber X para compras / 2 x Uber XL con maletas).",
+  "Para ir a Disney Springs usar el bus de All-Star Movies (Gratis / $0 USD).",
+  "Walmart es siempre la última parada del día para cargar las bolsas pesadas directo al hotel."
+];
+
+const tagMeta = {
+  free:{cls:"b-free", label:"Bus Gratis ($0)"},
+  uber:{cls:"b-uber", label:"2 x Uber X"},
+  uberxl:{cls:"b-uberxl", label:"2 x Uber XL (Valijas)"},
+  pickup:{cls:"b-pickup", label:"Store Pickup"},
+  walmart:{cls:"b-walmart", label:"Supermercado"}
+};
+
+const dom11Data = [
+  {
+    title: "1. Disney Springs (Paseo & Cena)",
+    sub: "Horario: 10:00 AM – 11:30 PM · Salida 17:00 hs",
+    address: "1486 Buena Vista Dr, Lake Buena Vista, FL 32830",
+    tags: ["free"],
+    transport: "🚌 Disney Transport (Bus Oficial) | Tiempo: 20-25 min | Costo: $0 USD",
+    details: [
+      "Tomar el autobús en la estación principal del hotel All-Star Movies (Cinema Hall).",
+      "Recorrer World of Disney, Lego Store, Uniqlo y cenar.",
+      "Permanencia sugerida: 3 horas y media (17:00 a 20:30 hs)."
+    ]
+  },
+  {
+    title: "2. Walmart Supercenter (Vineland Rd)",
+    sub: "Horario: 6:00 AM – 11:00 PM · Llegada 20:30 hs",
+    address: "3250 Vineland Rd, Kissimmee, FL 34746",
+    tags: ["uber","walmart"],
+    transport: "🚗 2 x Uber X | Distancia: 6.8 km | Tiempo: 10-12 min | Costo: ~$20-$24 USD total",
+    details: [
+      "Compras de abastecimiento: agua mineral, snacks, poncho de lluvia, protector solar.",
+      "Permanencia sugerida: 1 hora (20:30 a 21:30 hs)."
+    ]
+  },
+  {
+    title: "3. Regreso a All-Star Movies Resort",
+    sub: "Llegada 22:00 hs aprox.",
+    address: "1901 W Buena Vista Dr, Lake Buena Vista, FL 32830",
+    tags: ["uber"],
+    transport: "🚗 2 x Uber X | Distancia: 13.7 km | Tiempo: 15-18 min | Costo: ~$30-$36 USD total",
+    details: [
+      "Regreso directo desde el estacionamiento de Walmart al hotel para guardar compras y descansar."
+    ]
+  }
+];
+
+const lun12Data = [
+  {
+    title: "1. Orlando Vineland Premium Outlets",
+    sub: "Horario Lunes: 10:00 AM – 9:00 PM · Llegada 09:45 AM",
+    address: "8200 Vineland Ave, Orlando, FL 32821",
+    tags: ["uber"],
+    transport: "🚗 2 x Uber X | Distancia: 13.2 km | Tiempo: 15-18 min | Costo: ~$30-$36 USD total",
+    details: [
+      "Marcas clave: Nike Factory, Adidas, Tommy Hilfiger, Under Armour, Levi's, Columbia.",
+      "Llevar la valija carry-on vacía para meter las compras de ropa.",
+      "Almuerzo a las 12:30 hs en el Patio de Comidas interno.",
+      "Permanencia sugerida: 3.5 horas (10:00 a 13:30 hs)."
+    ]
+  },
+  {
+    title: "2. Best Buy Kissimmee + The Loop",
+    sub: "Horario Best Buy: 10:00 AM – 8:00 PM (Store #1529)",
+    address: "1620 W Osceola Pkwy, Kissimmee, FL 34741",
+    tags: ["uber","pickup"],
+    transport: "🚗 2 x Uber X | Distancia: 9.8 km | Tiempo: 12-15 min | Costo: ~$24-$30 USD total",
+    details: [
+      "1. Entrar a Best Buy Kissimmee y hacer las compras de electronica.",
+      "2. Caminar 250 metros cruzando el estacionamiento hacia el complejo The Loop.",
+      "3. Recorrer Ross Dress for Less, Marshalls y T.J. Maxx para ropa de descuento y valijas.",
+      "Permanencia sugerida: 3.5 horas (13:30 a 17:00 hs)."
+    ]
+  },
+  {
+    title: "3. Walmart Supercenter (Osceola Pkwy)",
+    sub: "Horario: 6:00 AM – 11:00 PM · Llegada 17:30 hs",
+    address: "1471 E Osceola Pkwy, Kissimmee, FL 34744",
+    tags: ["uber","walmart"],
+    transport: "🚗 2 x Uber X | Distancia: 5.6 km | Tiempo: 8-10 min | Costo: ~$20-$24 USD total",
+    details: [
+      "Compras de volumen: termos Stanley, golosinas, regalos pesados y souvenirs.",
+      "Permanencia sugerida: 2 horas (17:30 a 19:30 hs)."
+    ]
+  },
+  {
+    title: "4. Regreso a All-Star Movies Resort",
+    sub: "Llegada 20:00 hs aprox.",
+    address: "1901 W Buena Vista Dr, Lake Buena Vista, FL 32830",
+    tags: ["uber"],
+    transport: "🚗 2 x Uber X | Distancia: 13.7 km | Tiempo: 15-18 min | Costo: ~$30-$36 USD total",
+    details: [
+      "Cenar en The Loop o pedir Uber directo al hotel para guardar compras antes del primer día de parque."
+    ]
+  }
+];
+
+const dom18Data = [
+  {
+    title: "0. Traslado de Hotel (Disney ➔ Universal)",
+    sub: "Check-out 09:00 hs · Custodia de maletas 09:30 hs",
+    address: "4100 Universal Blvd, Orlando, FL 32819 (Terra Luna)",
+    tags: ["uberxl"],
+    transport: "🚐 2 x Uber XL (Valijas) | Distancia: 20.9 km | Tiempo: 20 min | Costo: ~$70-$90 USD total",
+    details: [
+      "Pedir 2 camionetas XL para trasladar a las 8 personas con todo el equipaje acumulado.",
+      "Dejar maletas en custodia gratuita en Bell Services de Terra Luna Resort.",
+      "Pedir 2 Uber X rumbo al shopping."
+    ]
+  },
+  {
+    title: "1. The Mall at Millenia",
+    sub: "Horario Domingo: 11:00 AM – 7:00 PM (Apertura 11:00 AM)",
+    address: "4200 Conroy Rd, Orlando, FL 32839",
+    tags: ["uber","pickup"],
+    transport: "🚗 2 x Uber X | Distancia: 13.6 km | Tiempo: 12-15 min | Costo: ~$28-$32 USD total",
+    details: [
+      "1. Entrar a las 11:00 AM directo al Apple Store a retirar productos por Store Pickup.",
+      "2. Recorrer Abercrombie & Fitch, Hollister, H&M, Sephora, Macy's.",
+      "3. Almuerzo grupal a las 13:00 hs en The Cheesecake Factory.",
+      "Permanencia sugerida: 3.5 horas (11:00 a 14:30 hs)."
+    ]
+  },
+  {
+    title: "2. Best Buy Millenia (A pie)",
+    sub: "Horario Domingo: 11:00 AM – 7:00 PM",
+    address: "4155 Millenia Blvd, Orlando, FL 32839",
+    tags: ["free","pickup"],
+    transport: "🚶 A PIE | Distancia: 0.6 km (600 metros) | Tiempo: 5 min | Costo: $0 USD",
+    details: [
+      "Salir por la entrada principal del Mall, cruzar Millenia Blvd por el semáforo y caminar 5 min a Best Buy.",
+      "Hacer compras de tecnología secundarias o accesorios.",
+      "Permanencia sugerida: 45 minutos (14:45 a 15:30 hs)."
+    ]
+  },
+  {
+    title: "3. Walmart Supercenter (S Kirkman Rd)",
+    sub: "Horario: 6:00 AM – 11:00 PM · Llegada 16:00 hs",
+    address: "2500 S Kirkman Rd, Orlando, FL 32819",
+    tags: ["uber","walmart"],
+    transport: "🚗 2 x Uber X | Distancia: 6.1 km | Tiempo: 8-10 min | Costo: ~$20-$24 USD total",
+    details: [
+      "Compras de supermercado finales y golosinas para el bloque de Universal / Epic Universe.",
+      "Permanencia sugerida: 2 horas (16:00 a 18:00 hs)."
+    ]
+  },
+  {
+    title: "4. Regreso y Check-in Terra Luna Resort",
+    sub: "Llegada 18:30 hs aprox.",
+    address: "4100 Universal Blvd, Orlando, FL 32819",
+    tags: ["uber"],
+    transport: "🚗 2 x Uber X | Distancia: 9.9 km | Tiempo: 12 min | Costo: ~$24-$30 USD total",
+    details: [
+      "Uber directo al hotel, retirar maletas de custodia, asignación de habitación y descanso."
+    ]
+  }
+];
+
+/* ================= RENDER HELPERS ================= */
+
+function renderBadges(tags){
+  return tags.map(t => `<span class="badge ${tagMeta[t].cls}">${tagMeta[t].label}</span>`).join("");
+}
+
+function renderChecklist(){
+  const c = document.getElementById("checklist-container");
+  c.innerHTML = checklistItems.map((txt, i) => `
+    <div class="check-item tap-row" onclick="toggleCheck(this)">
+      <div class="box">✓</div>
+      <div class="txt">${txt}</div>
+    </div>
+  `).join("");
+}
+
+function renderStubs(dataArray, containerId){
+  const container = document.getElementById(containerId);
+  container.innerHTML = dataArray.map(item => `
+    <div class="stub">
+      <div class="stub-head tap-row" onclick="toggleStub(this)">
+        <div class="htxt">
+          <div class="park-name">${item.title}</div>
+          <div class="park-sub">${item.sub}</div>
+        </div>
+        <div class="chev">⌄</div>
+      </div>
+      <div class="stub-body">
+        <div class="rope-drop">
+          <b>Transporte:</b> ${item.transport}
+        </div>
+
+        <p class="body-text"><b>Etiquetas:</b> ${renderBadges(item.tags)}</p>
+
+        <div class="block-title">Dirección GPS (Para Uber)</div>
+        <div class="gps-box">
+          <span>📍 ${item.address}</span>
+        </div>
+
+        <div class="block-title">Plan de acción</div>
+        ${item.details.map(d => `<p class="body-text">• ${d}</p>`).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ================= INTERACTIONS ================= */
+
+function toggleStub(headEl){
+  const stub = headEl.closest(".stub");
+  const body = stub.querySelector(".stub-body");
+  const isOpen = stub.classList.contains("open");
+
+  if(isOpen){
+    stub.classList.remove("open");
+    body.style.maxHeight = "0px";
+  } else {
+    stub.classList.add("open");
+    body.style.maxHeight = body.scrollHeight + 60 + "px";
+  }
+}
+
+function toggleCheck(el){
+  el.classList.toggle("done");
+}
+
+/* ================= NAV / INIT ================= */
+
+function setTab(tab){
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + tab).classList.add("active");
+  document.querySelectorAll("nav.bottom button").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === tab);
+  });
+  document.querySelector("main").scrollTop = 0;
+}
+
+document.getElementById("bottomNav").addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  setTab(btn.dataset.tab);
+});
+
+// initial render
+renderChecklist();
+renderStubs(dom11Data, "dom11-container");
+renderStubs(lun12Data, "lun12-container");
+renderStubs(dom18Data, "dom18-container");
+</script>
+</body>
+</html>
